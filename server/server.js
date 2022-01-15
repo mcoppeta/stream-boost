@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -7,12 +8,31 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.post('/refresh', (req, res) => {
+    const refreshToken = req.body.refreshToken;
+    const spotifyApi = new SpotifyWebApi({
+        redirectUri: process.env.REDIRECT_URI,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken,
+    });
+
+    spotifyApi.refreshAccessToken()
+        .then(() => {
+            console.log(data.body);
+        })
+        .catch(err => {
+            console.log(err);
+            res.sendStatus(400);
+        });
+});
+
 app.post('/login', (req, res) => {
     const code = req.body.code;
     const spotifyApi = new SpotifyWebApi({
-        redirectUri: 'http://localhost:3000',
-        clientId: 'bff2cdf0fb7a4ba680ed838ce9bbcea7',
-        clientSecret: '56cbc4feabf042ffbaabc9ac30525a55'
+        redirectUri: process.env.REDIRECT_URI,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
     });
 
     spotifyApi.authorizationCodeGrant(code)
@@ -23,9 +43,11 @@ app.post('/login', (req, res) => {
             expiresIn: data.body.expires_in,
         })
     })
-    .catch(() => {
+    .catch(err => {
+        console.log(err)
         res.sendStatus(400); //if error
     });
 });
 
+console.log("Starting server on port 3001\n");
 app.listen(3001);

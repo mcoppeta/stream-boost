@@ -15,7 +15,7 @@ const toQueryParams = (obj) => {
     count = 0;
     var parsed = '';
     while (count < ret.length) {
-        parsed += ret[count] == ' ' ? '%20' : ret[count];
+        parsed += ret[count] === ' ' ? '%20' : ret[count];
         count++;
     }
 
